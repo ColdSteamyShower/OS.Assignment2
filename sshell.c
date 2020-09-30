@@ -49,7 +49,7 @@ int main(void)
   ///////////////
   
   while (should_run) {
-    // set flag as 0 (aka no '&') at the start
+    // set flag as 0 (aka no '&') 
     flag = 0;
     
     // prompt user for a shell argument
