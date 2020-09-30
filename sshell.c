@@ -13,6 +13,7 @@ Assignment 2
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define MAX_LINE 80 /* The Maximum length command */
 extern int errno;
@@ -57,11 +58,11 @@ int main(void)
   fgets(str, MAX_LINE, stdin);
 
   // for testing
-  printf("%s", str);
+  printf(" executing argument: '%s'", str);
   //
 
 
-  // processing input into arguments
+  // process command line input into arguments
   ctr = processToArgs(str, args);
 
 
@@ -72,27 +73,30 @@ int main(void)
   }
 
 
+  ////////////////////////////////
+  // Process Fork and Execution //
+  ////////////////////////////////
+
+  // fork the process and make an identifier for that child process
+  pid_t pid = fork();
 
 
-
-  /*
-  pid_t pid;
-  pid = fork();
-  if (pid < 0) { // error occurred
+  if (pid < 0) { // fork() returns < 0 if error occurred
     fprintf(stderr, "Fork Failed");
     return 1;
   }
-  else if (pid == 0) { // child process
-    execlp("/bin/ls","ls",NULL);
+  else if (pid == 0) { // pid = 0 within the child process
+    execvp(args[0], args);
   }
   else { // parent process
     // parent will wait for the child to complete
-    wait(NULL);
-    printf("Child Complete");
+    pid = wait(NULL);
+    printf("Child Complete\n");
   }
-*/
   return 0;
 }
+
+
 
 // char* commandLine is an array of chars to be read for argmuents
 // char** arguments is an array of arguments in the form of nested char arrays
