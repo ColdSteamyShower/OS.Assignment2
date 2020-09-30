@@ -18,7 +18,9 @@ Assignment 2
 #define MAX_LINE 80 /* The Maximum length command */
 extern int errno;
 
+// precondition: arguments has valid size limit
 int processToArgs(char* commandLine, char** arguments);
+// postcondition: 'arguments' becomes an array of char arrays containing each word from 'commandLine'
 
 int main(void)
 {
@@ -50,14 +52,13 @@ int main(void)
     printf("osh>");
     fflush(stdout);
 
-    // retrieve command line and put into the char[] str // check for error !!!
+    // retrieve command line and put into the char[] str
     if (fgets(str, MAX_LINE, stdin) == NULL)
       fprintf(stderr,"Failed to read command line");
 
     // for testing
-    printf(" executing argument: '%s'", str);
+    printf("executing argument: '%s'", str);
     //
-
 
     // process command line input into arguments
     ctr = processToArgs(str, args);
@@ -68,6 +69,10 @@ int main(void)
     for (int i = 0; i < ctr; i++){
       printf("you entered:args[%d] : %s \n", i, args[i]);
     }
+
+    // skip NULL arguments
+    if (args[0] == NULL)
+      continue;
 
     // exit prgram if they meant to
     if (args[0][0] == 'e' && args[0][1] == 'x' && args[0][2] == 'i' && args[0][3] == 't'){
@@ -81,13 +86,13 @@ int main(void)
     // fork the process and make an identifier for that child process
     pid_t pid = fork();
 
-
     if (pid < 0) { // fork() returns < 0 if error occurred
-      fprintf(stderr, "Fork Failed");
+      fprintf(stderr, "Fork Failed\n");
       return 1;
     }
     else if (pid == 0) { // pid = 0 within the child process
-      execvp(args[0], args);
+      if (execvp(args[0], args) < 0)
+        printf("Command Execution Failed: unknown command '%s'\n", args[0]);
     }
     else { // parent process
       // parent will wait for the child to complete
@@ -115,7 +120,7 @@ int processToArgs(char* commandLine, char** arguments) {
   ///// [changed this to a while loop to avoid running the last if statement]
   ///// [also now we don't have to declare the iteration ints in global scope!]
   while (commandLine[i] != '\0') {
-    printf("Reading char: % \n", commandLine[i]);
+    printf("Reading char: %c \n", commandLine[i]);
     // if we are reading space or a new-line(end of the command line)
     if (commandLine[i] == ' ' || commandLine[i] == '\n'){
       printf("    we reached some white space!\n");
