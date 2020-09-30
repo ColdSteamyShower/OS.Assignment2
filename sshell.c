@@ -37,19 +37,23 @@ int main(void)
   // flag to determine when to exit
   int should_run = 1;
 
-  // number of arguments in *args[]. Do we need this? can we just check the size of args[]?
+  // number of arguments in *args[]
   int ctr;
 
+  // flag used to determine if user included an '&'
+  int flag;
 
 
   ///////////////
   // Main Loop //
   ///////////////
-
+  
   while (should_run) {
-
+    // set flag as 0 (aka no '&') at the start
+    flag = 0;
+    
     // prompt user for a shell argument
-    printf("osh>");
+    printf("osh> ");
     fflush(stdout);
 
     // retrieve command line and put into the char[] str
@@ -57,19 +61,20 @@ int main(void)
       fprintf(stderr,"Failed to read command line");
 
     // for testing
-    printf("executing argument: '%s'", str);
-    //
+    printf("executing argument: %s", str);
+   
 
     // process command line input into arguments
     ctr = processToArgs(str, args);
 
 
-    /*  TESING IF IT WORKED */
-
-    for (int i = 0; i < ctr; i++){
-      printf("you entered:args[%d] : %s \n", i, args[i]);
+    // checks to see if user entered an '&' to
+    // determine whether or not the parent process is to wait for child to exit
+    if ( ctr > 1 && args[ctr - 2][0] == '&' ){
+      flag = 1;
+      args[ctr - 2] = NULL;
     }
-
+ 
     // skip NULL arguments
     if (args[0] == NULL)
       continue;
@@ -91,13 +96,18 @@ int main(void)
       return 1;
     }
     else if (pid == 0) { // pid = 0 within the child process
-      if (execvp(args[0], args) < 0)
+      if (execvp(args[0], args) < 0) 
         printf("Command Execution Failed: unknown command '%s'\n", args[0]);
     }
     else { // parent process
-      // parent will wait for the child to complete
-      pid = wait(NULL);
-      printf("Child Complete\n");
+      // parent will wait for the child to complete if no '&' is included
+      if (flag != 1){
+	pid = wait(NULL);
+      }
+      // parent doesn't wait for the child to complete because flag == 1
+      
+      
+      printf("\n\nChild Complete\n");
     }
   }
 
@@ -120,42 +130,33 @@ int processToArgs(char* commandLine, char** arguments) {
   ///// [changed this to a while loop to avoid running the last if statement]
   ///// [also now we don't have to declare the iteration ints in global scope!]
   while (commandLine[i] != '\0') {
-    printf("Reading char: %c \n", commandLine[i]);
     // if we are reading space or a new-line(end of the command line)
     if (commandLine[i] == ' ' || commandLine[i] == '\n'){
-      printf("    we reached some white space!\n");
       // if we've actually been reading some chars (not a double space, ignore spaces at the start)
       if (i != j) {
-        printf("    we've read some chars! let's set argmuent ");
         // allocate an array of chars of size i-j
         arguments[argNum] = (char *) malloc((i - j) * sizeof(char));
 
         // fill up the argument array with the chars
-        printf("%d to ", argNum);
         for (int k = 0; k < (i - j); k++){
-          printf("%c",commandLine[j+k]);
       	   arguments[argNum][k] = commandLine[j + k];
         }
-        printf("\n");
         // completed this argument, on to the next one
         argNum++;
         j = i;
 
       // if we havent read anything new, its some other whitespace so we'll ignore
       } else {
-        printf("    but we haven't read any chars... skip!\n");
         i++;
         j++;
       }
 
     // the char we're at is in the middle of a word, keep reading
     } else {
-      printf("    its not white space! keep reading...\n");
       i++;
     }
   }
   // the last argument with content will be an end of file char to signal to stop reading arguments
-  printf("Read an ending character. Setting last arg to EOF\n");
   arguments[argNum] = '\0';
   return argNum+1;
 }
