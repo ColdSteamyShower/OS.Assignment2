@@ -51,7 +51,8 @@ int main(void)
     fflush(stdout);
 
     // retrieve command line and put into the char[] str // check for error !!!
-    fgets(str, MAX_LINE, stdin);
+    if (fgets(str, MAX_LINE, stdin) == NULL)
+      fprintf(stderr,"Failed to read command line");
 
     // for testing
     printf(" executing argument: '%s'", str);
