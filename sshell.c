@@ -44,55 +44,57 @@ int main(void)
   // Main Loop //
   ///////////////
 
-  /*
   while (should_run) {
 
+    // prompt user for a shell argument
+    printf("osh>");
+    fflush(stdout);
+
+    // retrieve command line and put into the char[] str // check for error !!!
+    fgets(str, MAX_LINE, stdin);
+
+    // for testing
+    printf(" executing argument: '%s'", str);
+    //
+
+
+    // process command line input into arguments
+    ctr = processToArgs(str, args);
+
+
+    /*  TESING IF IT WORKED */
+
+    for (int i = 0; i < ctr; i++){
+      printf("you entered:args[%d] : %s \n", i, args[i]);
+    }
+
+    // exit prgram if they meant to
+    if (args[0][0] == 'e' && args[0][1] == 'x' && args[0][2] == 'i' && args[0][3] == 't'){
+      break;
+    }
+
+    ////////////////////////////////
+    // Process Fork and Execution //
+    ////////////////////////////////
+
+    // fork the process and make an identifier for that child process
+    pid_t pid = fork();
+
+
+    if (pid < 0) { // fork() returns < 0 if error occurred
+      fprintf(stderr, "Fork Failed");
+      return 1;
+    }
+    else if (pid == 0) { // pid = 0 within the child process
+      execvp(args[0], args);
+    }
+    else { // parent process
+      // parent will wait for the child to complete
+      pid = wait(NULL);
+      printf("Child Complete\n");
+    }
   }
-  */
 
-  // prompt user for a shell argument
-  printf("osh>");
-  fflush(stdout);
-
-  // retrieve command line and put into the char[] str // check for error !!!
-  fgets(str, MAX_LINE, stdin);
-
-  // for testing
-  printf(" executing argument: '%s'", str);
-  //
-
-
-  // process command line input into arguments
-  ctr = processToArgs(str, args);
-
-
-  /*  TESING IF IT WORKED */
-
-  for (int i = 0; i < ctr; i++){
-    printf("you entered:args[%d] : %s \n", i, args[i]);
-  }
-
-
-  ////////////////////////////////
-  // Process Fork and Execution //
-  ////////////////////////////////
-
-  // fork the process and make an identifier for that child process
-  pid_t pid = fork();
-
-
-  if (pid < 0) { // fork() returns < 0 if error occurred
-    fprintf(stderr, "Fork Failed");
-    return 1;
-  }
-  else if (pid == 0) { // pid = 0 within the child process
-    execvp(args[0], args);
-  }
-  else { // parent process
-    // parent will wait for the child to complete
-    pid = wait(NULL);
-    printf("Child Complete\n");
-  }
   return 0;
 }
 
