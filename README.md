@@ -8,8 +8,7 @@ bbest@chapman.edu
 
 CPSC 380-01
 Assignment 2
-
-[mk@amk OS.Assignment2]$ gcc sshell.c -o sshell
+<pre><code>[mk@amk OS.Assignment2]$ gcc sshell.c -o sshell
 [mk@amk OS.Assignment2]$ ./sshell 
 osh> cat bar.txt
 executing argument: cat bar.txt
@@ -39,4 +38,4 @@ executing argument: emacs bar.txt &
 osh> exit
 executing argument: exit
 [mk@amk OS.Assignment2]$ 
-
+</code></pre>
