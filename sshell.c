@@ -103,11 +103,11 @@ int main(void)
       // parent will wait for the child to complete if no '&' is included
       if (flag != 1){
 	pid = wait(NULL);
+	printf("\n\nChild Complete\n");
       }
       // parent doesn't wait for the child to complete because flag == 1
       
       
-      printf("\n\nChild Complete\n");
     }
   }
 
